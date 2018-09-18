@@ -4,6 +4,8 @@ RSpec.describe 'Full cycle integration' do
       t.integer :score
       t.integer :user_id
       t.integer :test_id
+
+      t.timestamps
     end
   end
   with_model :Test do

@@ -1,3 +1,5 @@
+require 'stat_trek/config'
+
 module StatTrek
   module Utils
     KEY_WITHOUT_MAPPING = :__stat_trek_missing_key__
@@ -13,6 +15,18 @@ module StatTrek
             { mapping_or_field => KEY_WITHOUT_MAPPING }
           end
         end.reduce(:merge)
+      end
+
+      def initialize_strategy(opts, field)
+        key, options =
+          if opts.is_a?(Symbol)
+            [opts, nil]
+          else
+            opts.first
+          end
+
+        klass = StatTrek.config.agg_strategies.fetch(key)
+        klass.new(field, options)
       end
     end
   end

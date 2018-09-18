@@ -1,6 +1,6 @@
 RSpec.describe StatTrek do
   describe 'metadata' do
-    subject { Test.stat_trek_registry.fetch(:score) }
+    subject { Test.stat_trek_rule_for(:score) }
 
     context 'default config' do
       with_model :TestStatistic
@@ -11,15 +11,7 @@ RSpec.describe StatTrek do
       end
 
       it 'assigns statistics model' do
-        expect(subject[:stats_model]).to eq TestStatistic
-      end
-
-      it 'uses `override` agg strategy' do
-        expect(subject[:agg_strategy]).to eq :override
-      end
-
-      it 'defines key fields' do
-        expect(subject[:key_fields]).to eq(test_id: :id)
+        expect(subject.stats_model).to eq TestStatistic
       end
     end
 
@@ -35,11 +27,7 @@ RSpec.describe StatTrek do
       end
 
       it 'allows to pass config options' do
-        expect(subject).to eq(
-          stats_model:  CustomTestStats,
-          agg_strategy: :accumulate,
-          key_fields:   { user_id: :column1, test_id: :column2 }
-        )
+        expect(subject.stats_model).to eq CustomTestStats
       end
     end
   end
