@@ -1,4 +1,4 @@
-require 'stat_trek/config'
+require 'stat_trek/utils/strict_open_struct'
 
 module StatTrek
   module Utils

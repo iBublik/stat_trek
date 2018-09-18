@@ -1,8 +1,6 @@
 require 'stat_trek/config'
 require 'stat_trek/utils'
-require 'stat_trek/utils/strict_open_struct'
-
-require 'stat_trek/agg_strategies/base'
+require 'stat_trek/agg_strategies'
 
 module StatTrek
   BaseError = Class.new(StandardError)
@@ -85,8 +83,6 @@ module StatTrek
       )
 
       track_rules.agg_strategy.call(stats, value)
-
-      # stats.update!(field => value)
     end
   end
 end

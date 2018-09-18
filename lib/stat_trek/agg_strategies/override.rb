@@ -1,5 +1,3 @@
-require_relative './base'
-
 module StatTrek
   module AggStrategies
     class Override < Base

@@ -1,5 +1,3 @@
-require 'stat_trek/agg_strategies/accumulate'
-
 RSpec.describe StatTrek::AggStrategies::Accumulate do
   with_model :Statistic do
     table do |t|

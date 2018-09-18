@@ -1,5 +1,3 @@
-require 'stat_trek/agg_strategies/override'
-
 RSpec.describe StatTrek::AggStrategies::Override do
   with_model :Statistic do
     table do |t|

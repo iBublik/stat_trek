@@ -1,5 +1,3 @@
-require 'stat_trek/agg_strategies'
-
 module StatTrek
   class << self
     def config
