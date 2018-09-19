@@ -8,7 +8,7 @@ module StatTrek
   module ClassMethods
     def stat_trek(
       field, key_fields: __default_stat_trek_fields__, agg_strategy: :override,
-      stats_model: __default_stat_trek_stats_model__, guards: {}
+      stats_model: __default_stat_trek_stats_model__, guards: {}, touch: []
     )
       key_fields = Utils.prepare_key_fields(
         key_fields
@@ -29,11 +29,19 @@ module StatTrek
         end
       end
 
+      Array(touch).each do |association|
+        next if reflect_on_all_associations.find do |reflection|
+          reflection.name == association.to_sym
+        end
+
+        raise InvalidMetadataError, "Unknown association #{association}"
+      end
+
       __stat_trek_registry__[field] = Utils::StrictOpenStruct.new(
         key_fields: key_fields, stats_model: stats_model,
         agg_strategy: agg_strategy, guards: Utils.build_guards(
           guards
-        )
+        ), touch: Array(touch)
       )
     end
 
@@ -82,6 +90,10 @@ module StatTrek
       stats = track_rules.stats_model.find_or_create_by!(keys)
 
       track_rules.agg_strategy.call(stats, value)
+
+      track_rules.touch.each do |association|
+        public_send(association).stat_trek(field, value, context)
+      end
     end
   end
 end
