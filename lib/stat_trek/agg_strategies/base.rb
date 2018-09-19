@@ -3,19 +3,13 @@ module StatTrek
     class Base
       attr_reader :field, :meta
 
-      def initialize(field, meta = nil)
+      def initialize(field, meta = {})
         @field = field
-        @meta  = meta || default_meta
+        @meta  = meta
       end
 
       def call(_stats_instance, _value)
         raise NotImplementedError
-      end
-
-      private
-
-      def default_meta
-        {}
       end
     end
   end

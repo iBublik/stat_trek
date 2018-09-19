@@ -6,7 +6,7 @@ RSpec.describe StatTrek::AggStrategies::Accumulate do
   end
 
   let!(:stats) { Statistic.create!(score: 10) }
-  subject { described_class.new(:score) }
+  subject      { described_class.new(:score) }
 
   it 'adds new value to existing value' do
     expect { subject.call(stats, 20) }.to change { stats.reload.score }.to 30
