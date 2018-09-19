@@ -29,16 +29,8 @@ module StatTrek
       register(@agg_strategies, key, klass, config)
     end
 
-    def registered_strategy?(key)
-      registered?(@agg_strategies, key)
-    end
-
     def register_guard(key, klass, config = {})
       register(@guards, key, klass, config)
-    end
-
-    def registered_guard?(key)
-      registered?(@guards, key)
     end
 
     def update_guard(key, config)
@@ -59,10 +51,6 @@ module StatTrek
 
     def register(registry, key, klass, config)
       registry[key] = ConfigEntry.new(klass, config)
-    end
-
-    def registered?(registry, key)
-      registry.include?(key)
     end
   end
 end

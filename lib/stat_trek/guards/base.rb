@@ -1,9 +1,11 @@
 module StatTrek
   module Guards
     class Base
+      DEFAULT_ON_TRIGGER_CALLBACK = Proc.new
+
       attr_reader :meta, :on_trigger_callback
 
-      def initialize(on_trigger: proc {}, **meta)
+      def initialize(on_trigger: DEFAULT_ON_TRIGGER_CALLBACK, **meta)
         @on_trigger_callback = on_trigger
         @meta                = meta
       end

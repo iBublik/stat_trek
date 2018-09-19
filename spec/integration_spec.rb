@@ -47,6 +47,7 @@ RSpec.describe 'Full cycle integration', inline_jobs: true do
     end
 
     it "doesn't duplicate stats" do
+      binding.pry
       test.stats.create!(deps)
 
       expect { test.stat_trek!(:score, 10, deps) }.not_to(
