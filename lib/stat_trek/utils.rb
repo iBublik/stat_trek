@@ -20,13 +20,13 @@ module StatTrek
       def build_strategy(opts, field)
         key, options =
           if opts.is_a?(Symbol)
-            [opts, nil]
+            [opts, {}]
           else
             opts.first
           end
 
         config = StatTrek.config.agg_strategies.fetch(key)
-        config.klass.new(field, options)
+        config.klass.new(**config.options, field: field, **options)
       end
 
       def build_guards(guards)

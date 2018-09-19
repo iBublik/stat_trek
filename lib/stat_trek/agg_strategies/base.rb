@@ -3,7 +3,7 @@ module StatTrek
     class Base
       attr_reader :field, :meta
 
-      def initialize(field, meta = {})
+      def initialize(field:, **meta)
         @field = field
         @meta  = meta
       end
