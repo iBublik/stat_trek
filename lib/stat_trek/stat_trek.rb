@@ -1,28 +1,14 @@
+require 'stat_trek/errors'
 require 'stat_trek/config'
 require 'stat_trek/utils'
 require 'stat_trek/agg_strategies'
+require 'stat_trek/guards'
 
 module StatTrek
-  BaseError = Class.new(StandardError)
-
-  InvalidMetadataError = Class.new(BaseError)
-
-  class MissingKeyError < BaseError
-    def initialize(key)
-      super("Required key is missing - #{key}")
-    end
-  end
-
-  class UnknownFieldError < BaseError
-    def initialize(field)
-      super("Unknown statistics field given - #{field}")
-    end
-  end
-
   module ClassMethods
     def stat_trek(
       field, key_fields: __default_stat_trek_fields__, agg_strategy: :override,
-      stats_model: __default_stat_trek_stats_model__
+      stats_model: __default_stat_trek_stats_model__, guards: {}
     )
       key_fields = Utils.prepare_key_fields(
         key_fields
@@ -35,11 +21,19 @@ module StatTrek
       unless StatTrek.config.registered_strategy?(agg_strategy)
         raise InvalidMetadataError, "Unknown strategy #{agg_strategy}"
       end
-      agg_strategy = Utils.initialize_strategy(agg_strategy, field)
+      agg_strategy = Utils.build_strategy(agg_strategy, field)
+
+      guards.keys.each do |guard_name|
+        unless StatTrek.config.registered_guard?(guard_name)
+          raise InvalidMetadataError, "Unknown guard #{guard_name}"
+        end
+      end
 
       __stat_trek_registry__[field] = Utils::StrictOpenStruct.new(
         key_fields: key_fields, stats_model: stats_model,
-        agg_strategy: agg_strategy
+        agg_strategy: agg_strategy, guards: Utils.build_guards(
+          guards
+        )
       )
     end
 
@@ -78,9 +72,14 @@ module StatTrek
         [stat_field, send(model_field)]
       end.to_h
 
-      stats = track_rules.stats_model.find_or_create_by!(
-        context.merge(missing_data)
-      )
+      keys = context.merge(missing_data)
+
+      triggerd_guards = Array(track_rules.guards).select do |guard|
+        guard.call(self, keys)
+      end
+      return if triggerd_guards.any?
+
+      stats = track_rules.stats_model.find_or_create_by!(keys)
 
       track_rules.agg_strategy.call(stats, value)
     end

@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'activerecord'
   spec.add_runtime_dependency 'activesupport'
+  spec.add_runtime_dependency 'redis'
 
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "rake", "~> 10.0"

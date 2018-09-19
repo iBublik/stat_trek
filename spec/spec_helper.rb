@@ -9,6 +9,8 @@ ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3', database: ':memory:'
 )
 
+require_relative './support/test_statistic_context'
+
 RSpec.shared_context 'user model' do
   extend WithModel
 

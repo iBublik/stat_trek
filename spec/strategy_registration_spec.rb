@@ -1,4 +1,6 @@
 RSpec.describe 'Registration of custom strategy' do
+  include_context 'test statistic'
+
   class Double < StatTrek::AggStrategies::Base
     def call(stats_instance, _value)
       stats_instance.class.where(
@@ -9,13 +11,6 @@ RSpec.describe 'Registration of custom strategy' do
 
   before(:all) do
     StatTrek.config.register_strategy :double, Double
-  end
-
-  with_model :TestStatistic do
-    table do |t|
-      t.integer :test_id
-      t.integer :score
-    end
   end
 
   with_model :Test do

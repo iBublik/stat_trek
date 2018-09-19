@@ -17,7 +17,7 @@ module StatTrek
         end.reduce(:merge)
       end
 
-      def initialize_strategy(opts, field)
+      def build_strategy(opts, field)
         key, options =
           if opts.is_a?(Symbol)
             [opts, nil]
@@ -27,6 +27,15 @@ module StatTrek
 
         klass = StatTrek.config.agg_strategies.fetch(key)
         klass.new(field, options)
+      end
+
+      def build_guards(guards)
+        guards.map do |guard_name, meta|
+          config = StatTrek.config.guards.fetch(guard_name)
+          config.klass.new(
+            **config.options, **meta
+          )
+        end
       end
     end
   end
