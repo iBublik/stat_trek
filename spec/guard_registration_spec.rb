@@ -1,4 +1,4 @@
-RSpec.describe 'Registration of custom guards' do
+RSpec.describe 'Registration of custom guards', inline_jobs: true do
   include_context 'test statistic'
 
   class FancyGuard < StatTrek::Guards::Base

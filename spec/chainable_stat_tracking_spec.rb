@@ -1,4 +1,4 @@
-RSpec.describe 'Chaining of statistics tracking' do
+RSpec.describe 'Chaining of statistics tracking', inline_jobs: true do
   with_model :CourseStats do
     table do |t|
       t.integer :score

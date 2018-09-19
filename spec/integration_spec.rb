@@ -1,4 +1,4 @@
-RSpec.describe 'Full cycle integration' do
+RSpec.describe 'Full cycle integration', inline_jobs: true do
   with_model :TestUserStatistic do
     table do |t|
       t.integer :score

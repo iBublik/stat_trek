@@ -4,6 +4,7 @@ require "stat_trek"
 require 'active_record'
 require 'with_model'
 require 'pry-byebug'
+require 'sidekiq/testing'
 
 ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3', database: ':memory:'
@@ -33,4 +34,8 @@ RSpec.configure do |config|
   config.extend WithModel
 
   config.include_context 'user model'
+
+  config.around(:example, inline_jobs: true) do |example|
+    Sidekiq::Testing.inline! { example.run }
+  end
 end

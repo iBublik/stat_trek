@@ -1,4 +1,4 @@
-RSpec.describe 'Registration of custom strategy' do
+RSpec.describe 'Registration of custom strategy', inline_jobs: true do
   include_context 'test statistic'
 
   class Double < StatTrek::AggStrategies::Base

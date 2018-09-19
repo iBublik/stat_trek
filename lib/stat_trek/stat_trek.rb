@@ -1,8 +1,11 @@
+require 'sidekiq'
+
 require 'stat_trek/errors'
 require 'stat_trek/config'
 require 'stat_trek/utils'
 require 'stat_trek/agg_strategies'
 require 'stat_trek/guards'
+require 'stat_trek/worker'
 
 module StatTrek
   module ClassMethods
@@ -46,7 +49,7 @@ module StatTrek
     end
 
     def stat_trek_rule_for(field)
-      __stat_trek_registry__.fetch(field) do
+      __stat_trek_registry__.fetch(field.to_sym) do
         raise UnknownFieldError, field
       end
     end
@@ -68,6 +71,7 @@ module StatTrek
 
   module InstanceMethods
     def stat_trek(field, value, context = {})
+      context     = context.symbolize_keys
       track_rules = self.class.stat_trek_rule_for(field)
 
       key_fields   = track_rules.key_fields
@@ -80,20 +84,14 @@ module StatTrek
         [stat_field, send(model_field)]
       end.to_h
 
-      keys = context.merge(missing_data)
+      keys = context.slice(*key_fields.keys).merge(missing_data)
 
       triggerd_guards = Array(track_rules.guards).select do |guard|
         guard.call(self, keys)
       end
       return if triggerd_guards.any?
 
-      stats = track_rules.stats_model.find_or_create_by!(keys)
-
-      track_rules.agg_strategy.call(stats, value)
-
-      track_rules.touch.each do |association|
-        public_send(association).stat_trek(field, value, context)
-      end
+      StatTrek::Worker.perform_async(self.class, id, field, value, keys)
     end
   end
 end

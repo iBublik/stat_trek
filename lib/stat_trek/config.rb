@@ -49,5 +49,15 @@ module StatTrek
     def registered_guard?(key)
       guards.include?(key)
     end
+
+    def sidekiq=(options)
+      Sidekiq.configure_server do |config|
+        config.redis = options
+      end
+
+      Sidekiq.configure_client do |config|
+        config.redis = options
+      end
+    end
   end
 end
