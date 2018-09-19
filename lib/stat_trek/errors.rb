@@ -1,7 +1,7 @@
 module StatTrek
-  BaseError = Class.new(StandardError)
-
+  BaseError            = Class.new(StandardError)
   InvalidMetadataError = Class.new(BaseError)
+  GuardError           = Class.new(BaseError)
 
   class MissingKeyError < BaseError
     def initialize(key)

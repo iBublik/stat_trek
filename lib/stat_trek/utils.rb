@@ -1,5 +1,3 @@
-require 'stat_trek/utils/strict_open_struct'
-
 module StatTrek
   module Utils
     KEY_WITHOUT_MAPPING = :__stat_trek_missing_key__

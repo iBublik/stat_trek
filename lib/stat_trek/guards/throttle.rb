@@ -45,14 +45,10 @@ module StatTrek
         super(meta)
       end
 
-      def call(model_instance, key_fields)
-        result = super
-        unless result
-          backend.store(
-            compute_key(key_fields), period
-          )
-        end
-        result
+      def after_skip(_model_instance, key_fields)
+        backend.store(
+          compute_key(key_fields), period
+        )
       end
 
       private

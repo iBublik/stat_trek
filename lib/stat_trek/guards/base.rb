@@ -9,11 +9,14 @@ module StatTrek
       end
 
       def call(model_instance, key_fields)
-        is_triggered = triggered?(model_instance, key_fields)
+        if triggered?(model_instance, key_fields)
+          on_trigger(model_instance)
 
-        on_trigger(model_instance) if is_triggered
+          raise GuardError
+        end
+      end
 
-        is_triggered
+      def after_skip(_model_instance, _key_fields)
       end
 
       private

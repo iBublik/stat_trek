@@ -5,6 +5,7 @@ require 'stat_trek/config'
 require 'stat_trek/utils'
 require 'stat_trek/agg_strategies'
 require 'stat_trek/guards'
+require 'stat_trek/rule'
 require 'stat_trek/worker'
 
 module StatTrek
@@ -40,15 +41,15 @@ module StatTrek
         raise InvalidMetadataError, "Unknown association #{association}"
       end
 
-      __stat_trek_registry__[field] = Utils::StrictOpenStruct.new(
-        key_fields: key_fields, stats_model: stats_model,
-        agg_strategy: agg_strategy, guards: Utils.build_guards(
+      __stat_trek_registry__[field] = Rule.new(
+        field: field, key_mapping: key_fields, model: stats_model,
+        strategy: agg_strategy, guards: Utils.build_guards(
           guards
-        ), touch: Array(touch)
+        ), associations: Array(touch)
       )
     end
 
-    def stat_trek_rule_for(field)
+    def rule_for(field)
       __stat_trek_registry__.fetch(field.to_sym) do
         raise UnknownFieldError, field
       end
@@ -67,31 +68,25 @@ module StatTrek
     def __default_stat_trek_stats_model__
       "#{self}Statistic".safe_constantize
     end
+
+
   end
 
   module InstanceMethods
     def stat_trek(field, value, context = {})
-      context     = context.symbolize_keys
-      track_rules = self.class.stat_trek_rule_for(field)
+      stat_trek!(field, value, context)
+    rescue MissingKeyError, GuardError
+      false
+    end
 
-      key_fields   = track_rules.key_fields
-      missing_keys = key_fields.reject do |stat_field, _model_field|
-        context.include?(stat_field)
-      end
-      missing_data = missing_keys.map do |stat_field, model_field|
-        raise(MissingKeyError, stat_field) unless respond_to?(model_field)
+    def stat_trek!(field, value, context = {})
+      rule_for(field).compile!(self, context)
 
-        [stat_field, send(model_field)]
-      end.to_h
+      Worker.perform_async(self.class, id, field, value, context)
+    end
 
-      keys = context.slice(*key_fields.keys).merge(missing_data)
-
-      triggerd_guards = Array(track_rules.guards).select do |guard|
-        guard.call(self, keys)
-      end
-      return if triggerd_guards.any?
-
-      StatTrek::Worker.perform_async(self.class, id, field, value, keys)
+    def rule_for(field)
+      self.class.rule_for(field)
     end
   end
 end

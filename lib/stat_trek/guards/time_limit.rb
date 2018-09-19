@@ -10,7 +10,7 @@ module StatTrek
 
       private
 
-      def triggered?(model_instance, _value)
+      def triggered?(model_instance, _key_fields)
         model_instance.public_send(time_field) <= Time.now
       end
     end

@@ -44,13 +44,13 @@ RSpec.describe 'Registration of custom guards', inline_jobs: true do
 
   context "guard isn't triggered" do
     it 'allow stats aggregation' do
-      expect { test.stat_trek(:score, 2) }.to change { stats.reload.score }
+      expect { test.stat_trek!(:score, 2) }.to change { stats.reload.score }
     end
 
     it "doesn't trigger callback" do
       expect(test).not_to receive(:do_some_stuff)
 
-      test.stat_trek(:score, 2)
+      test.stat_trek!(:score, 2)
     end
   end
 end

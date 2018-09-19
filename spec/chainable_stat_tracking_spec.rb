@@ -43,7 +43,7 @@ RSpec.describe 'Chaining of statistics tracking', inline_jobs: true do
   let(:attrs)  { Hash[user_id: 1] }
 
   it 'updates stats for specified association' do
-    test.stat_trek(:score, 20, attrs)
+    test.stat_trek!(:score, 20, attrs)
     course_stats = CourseStats.find_by!(**attrs, course_id: course.id)
 
     expect(course_stats.score).to eq 20

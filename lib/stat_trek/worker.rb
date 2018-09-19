@@ -4,22 +4,12 @@ module StatTrek
 
     sidekiq_options queue: 'stat_trek'
 
-    def perform(model_klass, model_id, field, value, keys)
-      klass = model_klass.constantize
+    def perform(model_klass, model_id, field, value, context)
+      model_instance = model_klass.constantize.find(model_id)
 
-      rule = klass.stat_trek_rule_for(field)
-
-      stats = rule.stats_model.find_or_create_by!(keys)
-
-      rule.agg_strategy.call(stats, value)
-
-      model_instance = klass.find(model_id)
-
-      rule.touch.each do |association|
-        Array(model_instance.public_send(association)).each do |instance|
-          instance.stat_trek(field, value, keys)
-        end
-      end
+      model_instance.rule_for(field).apply(
+        model_instance, value, context
+      )
     end
   end
 end

@@ -26,12 +26,14 @@ RSpec.describe StatTrek::Guards::Throttle do
   let(:test) { Test.new }
 
   it "doesn't trigger when backend is empty" do
-    expect(subject.call(test, test_id: 1, user_id: 2)).to be false
+    expect { subject.call(test, test_id: 1, user_id: 2) }.not_to raise_error
   end
 
   it "triggers when backend contains same data" do
-    subject.call(test, test_id: 1, user_id: 2)
+    subject.after_skip(test, test_id: 1, user_id: 2)
 
-    expect(subject.call(test, test_id: 1, user_id: 2)).to be true
+    expect { subject.call(test, test_id: 1, user_id: 2) }.to raise_error(
+      StatTrek::GuardError
+    )
   end
 end

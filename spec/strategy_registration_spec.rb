@@ -23,7 +23,7 @@ RSpec.describe 'Registration of custom strategy', inline_jobs: true do
   subject { TestStatistic.create!(test_id: test.id, score: 50) }
 
   it 'changes stats by logic described in registered strategy' do
-    expect { test.stat_trek(:score, 10) }.to change { subject.reload.score }
+    expect { test.stat_trek!(:score, 10) }.to change { subject.reload.score }
       .to 100
   end
 end
