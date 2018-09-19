@@ -25,8 +25,8 @@ module StatTrek
             opts.first
           end
 
-        klass = StatTrek.config.agg_strategies.fetch(key)
-        klass.new(field, options)
+        config = StatTrek.config.agg_strategies.fetch(key)
+        config.klass.new(field, options)
       end
 
       def build_guards(guards)

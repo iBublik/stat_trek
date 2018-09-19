@@ -82,7 +82,7 @@ class Test < ApplicationRecord
 end
 ```
 By default this guard uses redis as backend, but you can pass your own backend:
-`StatTrek.config.configure_guard :throttle, backend: your_backend_here`
+`StatTrek.config.update_guard :throttle, backend: your_backend_here`
 Backend should implement 2 methods: `store(key, expiration)` and `exists?(key)`. First one is used to persist information about statistic update, second one is for checking whether we can update same statistic field again.
 
 As with strategies, you can add your own guard. Create class inherited from `StatTrek::Guards::Base` and implement method `call`:

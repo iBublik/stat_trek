@@ -12,42 +12,37 @@ module StatTrek
   class Configuration
     attr_reader :agg_strategies, :guards
 
-    GuardConfig = Struct.new(:klass, :options) do
-      def initialize(klass, options = {})
-        super
-      end
-    end
+    ConfigEntry = Struct.new(:klass, :options)
 
     def initialize
-      @agg_strategies = {
-        override:   StatTrek::AggStrategies::Override,
-        accumulate: StatTrek::AggStrategies::Accumulate
-      }
+      @agg_strategies = {}
+      @guards         = {}
 
-      @guards = {
-        time_limit: GuardConfig.new(StatTrek::Guards::TimeLimit),
-        throttle:   GuardConfig.new(StatTrek::Guards::TimeLimit)
-      }
+      register_strategy :override,   StatTrek::AggStrategies::Override
+      register_strategy :accumulate, StatTrek::AggStrategies::Accumulate
+
+      register_guard :time_limit, StatTrek::Guards::TimeLimit
+      register_guard :throttle,   StatTrek::Guards::Throttle
     end
 
-    def register_strategy(key, klass)
-      agg_strategies[key] = klass
+    def register_strategy(key, klass, config = {})
+      register(@agg_strategies, key, klass, config)
     end
 
     def registered_strategy?(key)
-      agg_strategies.include?(key)
+      registered?(@agg_strategies, key)
     end
 
     def register_guard(key, klass, config = {})
-      guards[key] = GuardConfig.new(klass, config)
-    end
-
-    def configure_guard(key, config)
-      guards.fetch(key).options = config
+      register(@guards, key, klass, config)
     end
 
     def registered_guard?(key)
-      guards.include?(key)
+      registered?(@guards, key)
+    end
+
+    def update_guard(key, config)
+      @guards.fetch(key).options.merge!(config)
     end
 
     def sidekiq=(options)
@@ -58,6 +53,16 @@ module StatTrek
       Sidekiq.configure_client do |config|
         config.redis = options
       end
+    end
+
+    private
+
+    def register(registry, key, klass, config)
+      registry[key] = ConfigEntry.new(klass, config)
+    end
+
+    def registered?(registry, key)
+      registry.include?(key)
     end
   end
 end
