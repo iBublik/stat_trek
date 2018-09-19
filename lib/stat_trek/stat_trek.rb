@@ -1,12 +1,13 @@
 require 'sidekiq'
 
-require 'stat_trek/errors'
 require 'stat_trek/config'
+require 'stat_trek/errors'
+require 'stat_trek/worker'
+
 require 'stat_trek/agg_strategies'
 require 'stat_trek/guards'
 require 'stat_trek/rule_builder'
 require 'stat_trek/rule'
-require 'stat_trek/worker'
 
 module StatTrek
   module ClassMethods
