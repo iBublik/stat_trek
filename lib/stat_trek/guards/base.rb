@@ -1,7 +1,7 @@
 module StatTrek
   module Guards
     class Base
-      DEFAULT_ON_TRIGGER_CALLBACK = Proc.new
+      DEFAULT_ON_TRIGGER_CALLBACK = proc {}
 
       attr_reader :meta, :on_trigger_callback
 
