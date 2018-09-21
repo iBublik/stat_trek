@@ -54,7 +54,7 @@ class DoubleStrategy < StatTrek::AggStrategies::Base
 end
 ```
 Method `call` accepts 2 arguments - the instance of statistic that will be updated and the given value.
-Then you should register your strategy - `StatTrek.config.registered_strategy :double, DoubleStrategy`.
+Then you should register your strategy - `StatTrek.config.register_strategy :double, DoubleStrategy`.
 And you're good to go:
 ```ruby
 class Test < ApplicationRecord
@@ -110,13 +110,13 @@ class Course < ApplicationRecord
   belongs_to :session
   has_many :tests
 
-  stat_trek :score, key_fields: [:user_id, course_id: :id], , agg_strategy: :accumulate, touch: :tests
+  stat_trek :score, key_fields: [:user_id, course_id: :id], , agg_strategy: :accumulate, touch: :session
 end
 
 class Test < ApplicationRecord
   belongs_to :course
 
-  stat_trek :score, key_fields: [:user_id, test_id: :id], agg_strategy: :accumulate, touch: :session
+  stat_trek :score, key_fields: [:user_id, test_id: :id], agg_strategy: :accumulate, touch: :course
 end
 ```
 
