@@ -1,4 +1,4 @@
-RSpec.describe StatTrek::AggStrategies::Accumulate do
+RSpec.describe StatTrek::AggStrategies::Sum do
   with_model :Statistic do
     table do |t|
       t.integer :score

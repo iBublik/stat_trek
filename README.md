@@ -31,17 +31,17 @@ By default it assumes that you have model named `TestStatistc` (model name + `St
 All described defaults can be overriden. Simply pass option you want to override at class level definition:
 ```ruby
 class Test < ApplicationRecord
-  stat_trek :score, stats_model: MyModelWithStatistic, key_fields: [:user_id, test_slug: :slug], agg_strategy: :accumulate
+  stat_trek :score, stats_model: MyModelWithStatistic, key_fields: [:user_id, test_slug: :slug], agg_strategy: :sum
 end
 ```
-The line above will create rule to update `MyModelWithStatistic` model with help of built in `accumulate` strategy.
+The line above will create rule to update `MyModelWithStatistic` model with help of built in `sum` strategy.
 It also describes non-standard key fields. First is `user_id` and it has no mapping, that means it can't be taken from instance of model that calls statistic update. This key and it's value should be passed as last option when calling `stat_trek` instance method: `test.stat_trek(:score, 20, user_id: 1)`.
 The second one is mapping pair `test_slug: :slug` where first element is name of key field in statistics model and last is key field name in model containing the tracking description. So, assuming that `test.slug == 'ruby'`, calling `test.stat_trek(:score, 20, user_id: 1)` will find or create instance of `MyModelWithStatistic` by these attributes `user_id: 1, test_slug: 'ruby'`.
 
 ## Aggregation strategies
 By default there's two aggregation strategies:
 - `override`. Simply replaces current value with new one
-- `accumulate`. Adds given value with new one (race-condition free way).
+- `sum`. Adds given value with new one (race-condition free way).
 
 You can define custom aggregations. Just define your class with necessary logic, inherit it from `StatTrek::AggStrategies::Base` and define method `call` in it:
 ```ruby
@@ -103,20 +103,20 @@ You can specify associations which should update there's statistic too. Let's ta
 class Session < ApplicationRecord
   has_many :courses
 
-  stat_trek :score, key_fields: [:user_id, session_id: :id], agg_strategy: :accumulate
+  stat_trek :score, key_fields: [:user_id, session_id: :id], agg_strategy: :sum
 end
 
 class Course < ApplicationRecord
   belongs_to :session
   has_many :tests
 
-  stat_trek :score, key_fields: [:user_id, course_id: :id], , agg_strategy: :accumulate, touch: :session
+  stat_trek :score, key_fields: [:user_id, course_id: :id], , agg_strategy: :sum, touch: :session
 end
 
 class Test < ApplicationRecord
   belongs_to :course
 
-  stat_trek :score, key_fields: [:user_id, test_id: :id], agg_strategy: :accumulate, touch: :course
+  stat_trek :score, key_fields: [:user_id, test_id: :id], agg_strategy: :sum, touch: :course
 end
 ```
 
