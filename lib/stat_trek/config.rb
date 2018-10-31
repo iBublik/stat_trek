@@ -18,8 +18,8 @@ module StatTrek
       @agg_strategies = {}
       @guards         = {}
 
-      register_strategy :override,   StatTrek::AggStrategies::Override
-      register_strategy :accumulate, StatTrek::AggStrategies::Accumulate
+      register_strategy :override, StatTrek::AggStrategies::Override
+      register_strategy :sum,      StatTrek::AggStrategies::Sum
 
       register_guard :time_limit, StatTrek::Guards::TimeLimit
       register_guard :throttle,   StatTrek::Guards::Throttle
